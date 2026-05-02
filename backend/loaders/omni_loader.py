@@ -42,9 +42,10 @@ class OmniLoader(BaseLoader):
             results = self.model.transcribe(
                 [tmp_path],
                 lang=lang if lang and lang != "ar" else None,
+                batch_size=1,
             )
             
             # Extract text from first result
-            return results[0].text if results else ""
+            return results[0] if results else ""
         finally:
             os.unlink(tmp_path)
