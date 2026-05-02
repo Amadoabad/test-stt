@@ -1,13 +1,17 @@
 #!/usr/bin/env bash
 set -e
-export HF_HOME=/workspace/models      # persistent vast.ai storage
+export HF_HOME="${HF_HOME:-.}/models"      # persistent storage (default: local)
 export CUDA_VISIBLE_DEVICES=0
 export PYTHONUNBUFFERED=1
 
-cd /workspace/stt-eval/backend
+# Navigate to backend directory (handle both local and vast.ai paths)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
 
 # Install deps (uv reads pyproject.toml)
+echo "Installing dependencies..."
 uv sync
 
 # Launch
+echo "Starting STT Evaluation API on 0.0.0.0:8000"
 uv run uvicorn main:app --host 0.0.0.0 --port 8000 --workers 1
