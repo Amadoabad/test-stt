@@ -16,15 +16,17 @@ class NeMoLoader(BaseLoader):
         self._loaded = True
 
     def transcribe(self, audio: np.ndarray, lang: str = "ar") -> str:
-        # NeMo requires a file path, so write a temp WAV
         with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as f:
             sf.write(f.name, audio, 16000)
             tmp_path = f.name
         try:
             result = self.model.transcribe([tmp_path])
-            # result is a list; for hybrid models it may be (hyps, scores)
-            if isinstance(result[0], list):
-                return result[0][0]
-            return result[0]
+            # result[0] is a Hypothesis object for hybrid RNNT/CTC models
+            # extract .text, falling back through list nesting
+            hyp = result[0]
+            if isinstance(hyp, list):
+                hyp = hyp[0]
+            # Hypothesis object has a .text attribute; plain string passes through
+            return hyp.text if hasattr(hyp, "text") else str(hyp)
         finally:
             os.unlink(tmp_path)
