@@ -7,7 +7,7 @@ class ModelConfig:
     id: str  # HuggingFace model ID or NGC path
     name: str  # display name shown in UI
     loader: Literal[
-        "hf_pipeline", "hf_seq2seq", "hf_ctc", "nemo", "seamless", "mms", 'cohere'
+        "hf_pipeline", "hf_seq2seq", "hf_ctc", "nemo", "seamless", "mms", "cohere", "qwen"
     ]
     lang: str = "ar"
     notes: str = ""
