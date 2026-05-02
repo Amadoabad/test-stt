@@ -18,5 +18,6 @@ dependencies = [
   "scipy>=1.14",
   "datasets>=3.0",
   "sentencepiece>=0.2",
-  "nemo_toolkit[asr]>=2.1"
+  "nemo_toolkit[asr]>=2.1",
+  "qwen-asr>=0.0.6",
 ]
