@@ -5,8 +5,9 @@ import numpy as np
 class BaseLoader(ABC):
     """Abstract base class for all STT model loaders."""
 
-    def __init__(self, model_id: str):
+    def __init__(self, model_id: str, trust_remote_code: bool = False):
         self.model_id = model_id
+        self.trust_remote_code = trust_remote_code
         self._loaded = False
 
     @abstractmethod

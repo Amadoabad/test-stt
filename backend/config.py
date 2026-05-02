@@ -11,6 +11,7 @@ class ModelConfig:
     ]
     lang: str = "ar"
     notes: str = ""
+    trust_remote_code: bool = False
 
 
 MODELS: dict[str, ModelConfig] = {
@@ -21,35 +22,40 @@ MODELS: dict[str, ModelConfig] = {
         notes="Uses AutoModelForSpeechSeq2Seq",
     ),
     "cohere-transcribe": ModelConfig(
-        id="CohereLabs/cohere-transcribe-03-2026",
-        name="Cohere Transcribe",
-        loader="hf_seq2seq",
-        notes="Custom seq2seq arch, requires trust_remote_code",
+    id="CohereLabs/cohere-transcribe-03-2026",
+    name="Cohere Transcribe",
+    loader="hf_seq2seq",
+    trust_remote_code=True,
     ),
     "omni-300m": ModelConfig(
         id="facebook/omniASR-LLM-300M",
         name="OmniASR 300M",
         loader="hf_pipeline",
+        trust_remote_code=True,
     ),
     "omni-1b": ModelConfig(
         id="facebook/omniASR-LLM-1B",
         name="OmniASR 1B",
         loader="hf_pipeline",
+        trust_remote_code=True,
     ),
     "omni-3b": ModelConfig(
         id="facebook/omniASR-LLM-3B",
         name="OmniASR 3B",
         loader="hf_pipeline",
+        trust_remote_code=True,
     ),
     "omni-7b": ModelConfig(
         id="facebook/omniASR-LLM-7B",
         name="OmniASR 7B",
         loader="hf_pipeline",
+        trust_remote_code=True,
     ),
     "omni-7b-zs": ModelConfig(
         id="facebook/omniASR-LLM-7B-ZS",
         name="OmniASR 7B ZS",
         loader="hf_pipeline",
+        trust_remote_code=True,
     ),
     "nvidia-pcd": ModelConfig(
         id="nvidia/stt_ar_fastconformer_hybrid_large_pcd_v1.0",

@@ -24,7 +24,7 @@ class HFPipelineLoader(BaseLoader):
             device=DEVICE,
             torch_dtype=DTYPE,
             token=HF_TOKEN,
-            trust_remote_code=True,
+            trust_remote_code=self.trust_remote_code,
         )
         self._loaded = True
 
@@ -40,13 +40,13 @@ class HFSeq2SeqLoader(BaseLoader):
     """For models like Qwen3-ASR that need explicit generate() call."""
 
     def load(self):
-        self.processor = AutoProcessor.from_pretrained(self.model_id, token=HF_TOKEN, trust_remote_code=True)
+        self.processor = AutoProcessor.from_pretrained(self.model_id, token=HF_TOKEN, trust_remote_code=self.trust_remote_code)
         self.model = AutoModelForSpeechSeq2Seq.from_pretrained(
             self.model_id,
             torch_dtype=DTYPE,
             device_map="auto",
             token=HF_TOKEN,
-            trust_remote_code=True,
+            trust_remote_code=self.trust_remote_code,
         )
         self._loaded = True
 
@@ -68,13 +68,13 @@ class SeamlessLoader(BaseLoader):
     """Seamless M4T models for multilingual STT."""
 
     def load(self):
-        self.processor = AutoProcessor.from_pretrained(self.model_id, token=HF_TOKEN, trust_remote_code=True)
+        self.processor = AutoProcessor.from_pretrained(self.model_id, token=HF_TOKEN, trust_remote_code=self.trust_remote_code)
         self.model = SeamlessM4TForSpeechToText.from_pretrained(
             self.model_id,
             torch_dtype=DTYPE,
             device_map="auto",
             token=HF_TOKEN,
-            trust_remote_code=True,
+            trust_remote_code=self.trust_remote_code,
         )
         self._loaded = True
 
@@ -93,8 +93,8 @@ class MMSLoader(BaseLoader):
     def load(self):
         from transformers import Wav2Vec2Processor
 
-        self.processor = Wav2Vec2Processor.from_pretrained(self.model_id, token=HF_TOKEN, trust_remote_code=True)
-        self.model = Wav2Vec2ForCTC.from_pretrained(self.model_id, token=HF_TOKEN, trust_remote_code=True).to(DEVICE)
+        self.processor = Wav2Vec2Processor.from_pretrained(self.model_id, token=HF_TOKEN, trust_remote_code=self.trust_remote_code)
+        self.model = Wav2Vec2ForCTC.from_pretrained(self.model_id, token=HF_TOKEN, trust_remote_code=self.trust_remote_code).to(DEVICE)
         if DTYPE == torch.float16:
             self.model = self.model.to(DTYPE)
         # Set Arabic adapter

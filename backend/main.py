@@ -47,7 +47,7 @@ def get_loader(model_key: str):
     if model_key not in _cache:
         cfg = MODELS[model_key]
         loader_cls = LOADER_MAP[cfg.loader]
-        loader = loader_cls(cfg.id)
+        loader = loader_cls(cfg.id, trust_remote_code=cfg.trust_remote_code)
         loader.load()
         _cache[model_key] = loader
     return _cache[model_key]
@@ -100,6 +100,7 @@ def _download_task(model_key: str):
             local_dir=local_dir,
             ignore_patterns=["*.msgpack", "*.h5", "flax_model*"],
             token=os.environ.get("HF_TOKEN") or None,  # None = unauthenticated
+            trust_remote_code=cfg.trust_remote_code,
         )
         done.set()
         set_state(model_key, status=ModelStatus.DOWNLOADED, download_progress=100)
