@@ -18,7 +18,7 @@ MODELS: dict[str, ModelConfig] = {
     "qwen3-asr": ModelConfig(
         id="Qwen/Qwen3-ASR-1.7B",
         name="Qwen3 ASR 1.7B",
-        loader="hf_seq2seq",
+        loader="qwen",
         notes="Uses AutoModelForSpeechSeq2Seq",
     ),
     "cohere-transcribe": ModelConfig(
