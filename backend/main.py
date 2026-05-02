@@ -100,7 +100,6 @@ def _download_task(model_key: str):
             local_dir=local_dir,
             ignore_patterns=["*.msgpack", "*.h5", "flax_model*"],
             token=os.environ.get("HF_TOKEN") or None,  # None = unauthenticated
-            trust_remote_code=cfg.trust_remote_code,
         )
         done.set()
         set_state(model_key, status=ModelStatus.DOWNLOADED, download_progress=100)
