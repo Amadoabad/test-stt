@@ -14,56 +14,246 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      padding: 32px 16px;
-      gap: 24px;
+      padding: 16px;
+      gap: 16px;
     }
-    h1 { font-size: 22px; font-weight: 500; color: #fff; text-align: center; }
 
-    /* ── Card ── */
-    .card {
+    /* ── System bar (top) ── */
+    .system-bar {
       background: #1a1a1a;
       border: 1px solid #2e2e2e;
-      border-radius: 12px;
-      padding: 20px;
-      width: 100%;
-      max-width: 640px;
-    }
-
-    /* ── Config bar ── */
-    .config-row { display: flex; gap: 8px; align-items: center; }
-    .config-row label { font-size: 13px; color: #888; white-space: nowrap; }
-    .config-row input {
-      flex: 1;
-      background: #111;
-      border: 1px solid #333;
-      border-radius: 6px;
-      color: #e8e8e8;
-      padding: 6px 10px;
-      font-size: 13px;
-    }
-
-    /* ── Controls ── */
-    .controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-    select {
-      flex: 1;
-      background: #111;
-      border: 1px solid #333;
       border-radius: 8px;
+      padding: 12px 16px;
+      display: flex;
+      gap: 24px;
+      align-items: center;
+      font-size: 13px;
+      flex-wrap: wrap;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .system-bar .label { color: #666; }
+    .system-bar .value { color: #f0f0f0; font-weight: 500; }
+    .system-bar .bar {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .progress-bar {
+      width: 120px;
+      height: 6px;
+      background: #222;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: #4a9eff;
+      border-radius: 3px;
+      transition: width 0.3s;
+    }
+
+    /* ── Models grid ── */
+    .models-section {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .models-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: #888;
+      padding: 0 4px;
+    }
+    .models-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 12px;
+    }
+
+    /* ── Model card ── */
+    .model-card {
+      background: #1a1a1a;
+      border: 1px solid #2e2e2e;
+      border-radius: 10px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: border-color 0.2s;
+    }
+    .model-card:hover {
+      border-color: #3e3e3e;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .card-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: #f0f0f0;
+      flex: 1;
+    }
+    .card-size {
+      font-size: 12px;
+      color: #666;
+      white-space: nowrap;
+    }
+
+    .card-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+    }
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      background: #222;
+      color: #888;
+    }
+    .status-badge.loaded {
+      background: #1a3a1a;
+      color: #4ade80;
+    }
+    .status-badge.downloaded {
+      background: #1a2a3a;
+      color: #60a5fa;
+    }
+    .status-badge.downloading {
+      background: #3a2a1a;
+      color: #fbbf24;
+    }
+    .status-badge.error {
+      background: #3a1a1a;
+      color: #f87171;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .card-progress {
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .card-progress.show { display: flex; }
+    .progress-bar-large {
+      width: 100%;
+      height: 4px;
+      background: #222;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .progress-fill-large {
+      height: 100%;
+      background: #fbbf24;
+      border-radius: 2px;
+      transition: width 0.3s;
+    }
+    .progress-text {
+      font-size: 11px;
+      color: #666;
+    }
+
+    .card-error {
+      display: none;
+      padding: 8px;
+      background: #3a1a1a;
+      border-radius: 4px;
+      font-size: 11px;
+      color: #f87171;
+      border-left: 2px solid #f87171;
+    }
+    .card-error.show { display: block; }
+
+    .card-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      flex: 1;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .btn-primary {
+      background: #3b82f6;
+      color: #fff;
+    }
+    .btn-primary:hover { background: #2563eb; }
+    .btn-primary:disabled {
+      background: #555;
+      cursor: default;
+      opacity: 0.6;
+    }
+    .btn-secondary {
+      background: #555;
       color: #e8e8e8;
-      padding: 10px 12px;
-      font-size: 15px;
+    }
+    .btn-secondary:hover { background: #666; }
+    .btn-secondary:disabled {
+      opacity: 0.6;
+      cursor: default;
+    }
+    .btn-danger {
+      background: #ef4444;
+      color: #fff;
+    }
+    .btn-danger:hover { background: #dc2626; }
+
+    /* ── Record section ── */
+    .record-section {
+      background: #1a1a1a;
+      border: 1px solid #2e2e2e;
+      border-radius: 10px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .record-section h2 {
+      font-size: 14px;
+      color: #888;
+      font-weight: 500;
+    }
+
+    .record-controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
     }
     #record-btn {
-      width: 56px; height: 56px;
+      width: 56px;
+      height: 56px;
       border-radius: 50%;
       border: none;
       cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       transition: background 0.2s, transform 0.1s;
       flex-shrink: 0;
     }
-    #record-btn.idle    { background: #c0392b; }
+    #record-btn.idle { background: #c0392b; }
     #record-btn.recording { background: #e74c3c; animation: pulse 1s infinite; }
     #record-btn.processing { background: #555; cursor: default; }
     @keyframes pulse {
@@ -73,7 +263,16 @@
     .mic-icon { width: 22px; height: 22px; fill: #fff; }
     .stop-icon { width: 18px; height: 18px; fill: #fff; }
 
-    /* ── Status / result ── */
+    select {
+      flex: 1;
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 8px;
+      color: #e8e8e8;
+      padding: 10px 12px;
+      font-size: 14px;
+    }
+
     .status-text { font-size: 13px; color: #666; min-height: 18px; }
     .result-box {
       background: #111;
@@ -89,14 +288,27 @@
       white-space: pre-wrap;
     }
     .result-meta {
-      display: flex; justify-content: space-between;
-      font-size: 12px; color: #555; margin-top: 6px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #555;
+      margin-top: 6px;
     }
 
     /* ── History ── */
+    .history-section {
+      background: #1a1a1a;
+      border: 1px solid #2e2e2e;
+      border-radius: 10px;
+      padding: 16px;
+    }
     .history-header {
-      font-size: 13px; font-weight: 500; color: #666;
-      margin-bottom: 10px; display: flex; justify-content: space-between;
+      font-size: 13px;
+      font-weight: 500;
+      color: #666;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
     }
     .history-item {
       border-bottom: 1px solid #222;
@@ -109,7 +321,8 @@
 
     /* ── Spinner ── */
     .spinner {
-      width: 18px; height: 18px;
+      width: 18px;
+      height: 18px;
       border: 2px solid #333;
       border-top-color: #888;
       border-radius: 50%;
@@ -118,41 +331,73 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── Util ── */
-    .section-title { font-size: 13px; color: #555; font-weight: 500; margin-bottom: 12px; }
-    .gap { display: flex; flex-direction: column; gap: 12px; }
+    /* ── Config ── */
+    .config-section {
+      background: #1a1a1a;
+      border: 1px solid #2e2e2e;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    .config-input {
+      flex: 1;
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 6px;
+      color: #e8e8e8;
+      padding: 6px 10px;
+      font-size: 12px;
+    }
+    .config-status { color: #666; }
   </style>
 </head>
 <body>
 
-<h1>STT Evaluator — Arabic (Saudi)</h1>
-
-<!-- Config -->
-<div class="card">
-  <div class="config-row">
-    <label>Backend URL</label>
-    <input id="backend-url" type="text" value="http://localhost:8000" placeholder="http://<vast-ip>:<port>">
+<!-- System Bar -->
+<div class="system-bar">
+  <div class="bar">
+    <span class="label">GPU:</span>
+    <span class="value" id="gpu-name">—</span>
   </div>
-  <div id="connection-status" style="font-size:12px;color:#555;margin-top:6px;text-align:left"></div>
+  <div class="bar">
+    <span class="label">VRAM:</span>
+    <div class="progress-bar">
+      <div class="progress-fill" id="vram-fill"></div>
+    </div>
+    <span class="value" id="vram-text">—</span>
+  </div>
+  <div class="bar">
+    <span class="label">Disk free:</span>
+    <span class="value" id="disk-text">—</span>
+  </div>
 </div>
 
-<!-- Main -->
-<div class="card gap">
-  <p class="section-title">Select model & record</p>
-  <div class="controls">
+<!-- Models Grid -->
+<div class="models-section">
+  <div class="models-title">Model Management</div>
+  <div class="models-grid" id="models-grid">
+    <p style="color:#666;font-size:13px">Loading models…</p>
+  </div>
+</div>
+
+<!-- Record Section -->
+<div class="record-section">
+  <h2>Transcription</h2>
+  <div class="record-controls">
     <select id="model-select">
-      <option value="">Loading models…</option>
+      <option value="">Choose a loaded model…</option>
     </select>
     <button id="record-btn" class="idle" title="Record">
-      <!-- Mic SVG -->
       <svg class="mic-icon" id="btn-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path d="M12 2a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3zm6 9a6 6 0 0 1-12 0H4a8 8 0 0 0 16 0h-2zm-6 9v-2" stroke="#fff" stroke-width="1.8" stroke-linecap="round" fill="none"/>
       </svg>
     </button>
   </div>
-  <div class="status-text" id="status">Choose a model and press record.</div>
-
-  <!-- Current result -->
+  <div class="status-text" id="status">Choose a loaded model and press record.</div>
   <div class="result-box" id="result-box" dir="rtl">—</div>
   <div class="result-meta">
     <span id="result-model"></span>
@@ -161,12 +406,19 @@
 </div>
 
 <!-- History -->
-<div class="card">
+<div class="history-section">
   <div class="history-header">
     <span>History</span>
     <span id="clear-history" style="cursor:pointer;color:#444" onclick="clearHistory()">clear</span>
   </div>
   <div id="history-list"><p style="font-size:13px;color:#444">No transcriptions yet.</p></div>
+</div>
+
+<!-- Config -->
+<div class="config-section">
+  <label style="color:#888">Backend URL:</label>
+  <input id="backend-url" class="config-input" type="text" value="http://localhost:8000" placeholder="http://<host>:<port>">
+  <div class="config-status" id="connection-status">Not connected</div>
 </div>
 
 <script>
@@ -175,26 +427,225 @@ let recorder = null;
 let chunks = [];
 let recording = false;
 let history = [];
+let pollInterval = null;
+let modelStates = {};
+
+// ── API helpers ──────────────────────────────────────────────────
+async function fetchAPI(path) {
+  const url = document.getElementById('backend-url').value.trim();
+  try {
+    const res = await fetch(`${url}${path}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (e) {
+    console.error(`API error: ${path}`, e);
+    return null;
+  }
+}
+
+// ── System info ──────────────────────────────────────────────────
+async function refreshSystemInfo() {
+  const sys = await fetchAPI('/system');
+  if (!sys) return;
+
+  const gpuEl = document.getElementById('gpu-name');
+  const vramTextEl = document.getElementById('vram-text');
+  const vramFillEl = document.getElementById('vram-fill');
+  const diskEl = document.getElementById('disk-text');
+
+  gpuEl.textContent = sys.gpu || 'CPU';
+  diskEl.textContent = `${sys.disk_free_gb} GB`;
+
+  if (sys.cuda && sys.vram_total_gb > 0) {
+    const pct = (sys.vram_used_gb / sys.vram_total_gb) * 100;
+    vramFillEl.style.width = `${pct}%`;
+    vramTextEl.textContent = `${sys.vram_used_gb} / ${sys.vram_total_gb} GB`;
+  } else {
+    vramTextEl.textContent = 'N/A';
+  }
+}
+
+// ── Model states ─────────────────────────────────────────────────
+async function refreshModelStates() {
+  const states = await fetchAPI('/model-states');
+  if (!states) return;
+  
+  modelStates = states;
+  renderModelCards(states);
+  updateTranscriptionDropdown(states);
+}
+
+function renderModelCards(states) {
+  const grid = document.getElementById('models-grid');
+  grid.innerHTML = Object.entries(states)
+    .map(([key, state]) => renderModelCard(key, state))
+    .join('');
+
+  // Attach event listeners
+  Object.entries(states).forEach(([key, state]) => {
+    const downloadBtn = document.getElementById(`download-${key}`);
+    const loadBtn = document.getElementById(`load-${key}`);
+    const unloadBtn = document.getElementById(`unload-${key}`);
+
+    if (downloadBtn) {
+      downloadBtn.addEventListener('click', () => downloadModel(key));
+    }
+    if (loadBtn) {
+      loadBtn.addEventListener('click', () => loadModel(key));
+    }
+    if (unloadBtn) {
+      unloadBtn.addEventListener('click', () => unloadModel(key));
+    }
+  });
+}
+
+function renderModelCard(key, state) {
+  const modelCfg = window.modelCatalog?.[key] || {};
+  const size = state.size_gb ? `[${state.size_gb}GB]` : '';
+  let statusBadge = '';
+  let actions = '';
+  let progress = '';
+  let error = '';
+
+  // Status badge
+  if (state.status === 'loaded') {
+    statusBadge = `<div class="status-badge loaded"><span class="status-dot"></span>Loaded</div>`;
+    actions = `<button id="unload-${key}" class="btn btn-danger">Unload from VRAM</button>`;
+  } else if (state.status === 'downloaded') {
+    statusBadge = `<div class="status-badge downloaded"><span class="status-dot"></span>Ready (on disk)</div>`;
+    actions = `
+      <button id="load-${key}" class="btn btn-primary">Load into VRAM</button>
+      <button id="delete-${key}" class="btn btn-secondary" style="flex:0">Delete</button>
+    `;
+  } else if (state.status === 'downloading') {
+    statusBadge = `<div class="status-badge downloading"><span class="status-dot"></span>Downloading</div>`;
+    progress = `
+      <div class="card-progress show">
+        <div class="progress-bar-large">
+          <div class="progress-fill-large" style="width:${state.progress}%"></div>
+        </div>
+        <div class="progress-text">${Math.round(state.progress)}% • ${state.size_gb} GB</div>
+      </div>
+    `;
+    actions = `<button class="btn btn-secondary" disabled>Downloading…</button>`;
+  } else if (state.status === 'loading') {
+    statusBadge = `<div class="status-badge downloading"><span class="status-dot"></span>Loading…</div>`;
+    actions = `<button class="btn btn-secondary" disabled>Loading…</button>`;
+  } else if (state.status === 'error') {
+    statusBadge = `<div class="status-badge error"><span class="status-dot"></span>Error</div>`;
+    error = `<div class="card-error show">${state.error || 'Unknown error'}</div>`;
+    actions = `<button id="download-${key}" class="btn btn-primary">Retry Download</button>`;
+  } else {
+    statusBadge = `<div class="status-badge"><span class="status-dot"></span>Not downloaded</div>`;
+    actions = `<button id="download-${key}" class="btn btn-primary">Download</button>`;
+  }
+
+  return `
+    <div class="model-card">
+      <div class="card-header">
+        <div class="card-title">${modelCfg.name || key}</div>
+        <div class="card-size">${size}</div>
+      </div>
+      <div class="card-status">${statusBadge}</div>
+      ${progress}
+      ${error}
+      <div class="card-actions">${actions}</div>
+    </div>
+  `;
+}
+
+async function downloadModel(key) {
+  const res = await fetchAPI(`/download/${key}`);
+  if (res) {
+    await refreshModelStates();
+    startPolling(true);
+  }
+}
+
+async function loadModel(key) {
+  const res = await fetchAPI(`/load/${key}`);
+  if (res) {
+    await refreshModelStates();
+    startPolling(true);
+  }
+}
+
+async function unloadModel(key) {
+  const res = await fetchAPI(`/unload/${key}`);
+  if (res) {
+    await refreshModelStates();
+  }
+}
+
+function updateTranscriptionDropdown(states) {
+  const sel = document.getElementById('model-select');
+  const loaded = Object.entries(states)
+    .filter(([_, s]) => s.loaded)
+    .map(([k, _]) => k);
+
+  const selected = sel.value;
+  sel.innerHTML = loaded.length
+    ? loaded.map(k => `<option value="${k}">${window.modelCatalog?.[k]?.name || k}</option>`).join('')
+    : `<option value="">No loaded models</option>`;
+
+  if (loaded.includes(selected)) {
+    sel.value = selected;
+  }
+}
+
+// ── Polling ──────────────────────────────────────────────────────
+function startPolling(fast = false) {
+  stopPolling();
+  const interval = fast ? 2000 : 10000;
+  pollInterval = setInterval(refreshAll, interval);
+}
+
+function stopPolling() {
+  if (pollInterval) {
+    clearInterval(pollInterval);
+    pollInterval = null;
+  }
+}
+
+async function refreshAll() {
+  await refreshSystemInfo();
+  await refreshModelStates();
+
+  // Check if any model is in progress
+  const busy = Object.values(modelStates).some(s =>
+    s.status === 'downloading' || s.status === 'loading'
+  );
+  if (busy && !pollInterval) {
+    startPolling(true);
+  } else if (!busy && pollInterval && Number(pollInterval) !== 10000) {
+    startPolling(false);
+  }
+}
 
 // ── Init ──────────────────────────────────────────────────────
 async function init() {
-  const url = document.getElementById('backend-url').value.trim();
   try {
-    const res = await fetch(`${url}/models`);
-    const models = await res.json();
-    const sel = document.getElementById('model-select');
-    sel.innerHTML = models.map(m =>
-      `<option value="${m.key}">${m.name}</option>`
-    ).join('');
-    setStatus(`${models.length} models available. Press record to start.`);
+    // Fetch model catalog
+    const models = await fetchAPI('/models');
+    if (models) {
+      window.modelCatalog = {};
+      models.forEach(m => {
+        window.modelCatalog[m.key] = m;
+      });
+    }
+
     // Health check
-    const h = await fetch(`${url}/health`);
-    const hj = await h.json();
-    document.getElementById('connection-status').textContent =
-      `Connected · ${hj.gpu ?? 'CPU'} · CUDA: ${hj.cuda}`;
-  } catch(e) {
-    setStatus('Cannot reach backend. Check URL above.', 'error');
-    document.getElementById('connection-status').textContent = 'Not connected';
+    const health = await fetchAPI('/health');
+    if (health) {
+      document.getElementById('connection-status').textContent = 'Connected';
+    }
+
+    // Initial refresh
+    await refreshAll();
+    startPolling(false);
+  } catch (e) {
+    console.error('Init error:', e);
+    document.getElementById('connection-status').textContent = 'Error';
   }
 }
 
@@ -213,15 +664,19 @@ btn.addEventListener('click', async () => {
 });
 
 async function startRecording() {
-  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-  recorder = new MediaRecorder(stream, { mimeType: 'audio/webm;codecs=opus' });
-  chunks = [];
-  recorder.ondataavailable = e => chunks.push(e.data);
-  recorder.onstop = handleRecordingStop;
-  recorder.start();
-  recording = true;
-  btn.className = 'recording';
-  setStatus('Recording… click again to stop.');
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    recorder = new MediaRecorder(stream, { mimeType: 'audio/webm;codecs=opus' });
+    chunks = [];
+    recorder.ondataavailable = e => chunks.push(e.data);
+    recorder.onstop = handleRecordingStop;
+    recorder.start();
+    recording = true;
+    btn.className = 'recording';
+    setStatus('Recording… click again to stop.');
+  } catch (e) {
+    setStatus(`Microphone error: ${e.message}`, 'error');
+  }
 }
 
 function stopRecording() {
@@ -264,7 +719,7 @@ async function transcribe(blob, modelKey) {
     showResult(data);
     addHistory(data);
     setStatus(`Done · ${data.latency_ms}ms`);
-  } catch(e) {
+  } catch (e) {
     setStatus(`Error: ${e.message}`, 'error');
     document.getElementById('result-box').textContent = '—';
   }
@@ -301,10 +756,10 @@ function clearHistory() {
   renderHistory();
 }
 
-function setStatus(html, type) {
+function setStatus(text, style = 'normal') {
   const el = document.getElementById('status');
-  el.innerHTML = html;
-  el.style.color = type === 'error' ? '#e74c3c' : '#666';
+  el.innerHTML = text;
+  el.style.color = style === 'error' ? '#f87171' : '#888';
 }
 </script>
 </body>

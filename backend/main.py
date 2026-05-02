@@ -1,7 +1,10 @@
+import os
 import time
 import traceback
+import threading
+from pathlib import Path
 import numpy as np
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -9,6 +12,7 @@ from config import MODELS
 from audio_utils import decode_to_16k_mono
 from loaders.hf_loader import HFPipelineLoader, HFSeq2SeqLoader, SeamlessLoader, MMSLoader
 from loaders.nemo_loader import NeMoLoader
+from model_manager import ModelStatus, get_state, set_state, get_all_states
 
 app = FastAPI(title="STT Evaluation API")
 
@@ -42,6 +46,71 @@ def get_loader(model_key: str):
         loader.load()
         _cache[model_key] = loader
     return _cache[model_key]
+
+
+# ── Background tasks ──────────────────────────────────────────────
+
+def _download_task(model_key: str):
+    """Download model to disk without loading into VRAM."""
+    import threading
+    import time
+    from huggingface_hub import snapshot_download, model_info as hf_model_info
+    
+    cfg = MODELS[model_key]
+    hf_home = os.environ.get("HF_HOME", os.path.expanduser("~/.cache/huggingface"))
+    local_dir = os.path.join(hf_home, "hub", model_key)
+    os.makedirs(local_dir, exist_ok=True)
+    
+    # Get expected total size
+    try:
+        info = hf_model_info(cfg.id)
+        total_bytes = sum(s.size for s in info.siblings if s.size)
+    except Exception:
+        total_bytes = 0
+    
+    set_state(model_key, download_size_gb=round(total_bytes / 1e9, 2))
+    
+    # Poll directory size in background thread
+    done = threading.Event()
+    def size_poller():
+        while not done.is_set():
+            try:
+                current = sum(
+                    f.stat().st_size
+                    for f in Path(local_dir).rglob("*")
+                    if f.is_file()
+                )
+                pct = min(99, current / max(total_bytes, 1) * 100)
+                set_state(model_key, download_progress=pct)
+            except Exception:
+                pass
+            time.sleep(1.5)
+    
+    t = threading.Thread(target=size_poller, daemon=True)
+    t.start()
+    
+    try:
+        snapshot_download(
+            repo_id=cfg.id,
+            local_dir=local_dir,
+            ignore_patterns=["*.msgpack", "*.h5", "flax_model*"]
+        )
+        done.set()
+        set_state(model_key, status=ModelStatus.DOWNLOADED, download_progress=100)
+    except Exception as e:
+        done.set()
+        set_state(model_key, status=ModelStatus.ERROR, error_msg=str(e))
+
+
+def _load_task(model_key: str):
+    """Load model from disk into VRAM."""
+    set_state(model_key, status=ModelStatus.LOADING)
+    try:
+        get_loader(model_key)
+        set_state(model_key, status=ModelStatus.LOADED)
+    except Exception as e:
+        set_state(model_key, status=ModelStatus.ERROR, error_msg=str(e))
+
 
 # ── Routes ───────────────────────────────────────────────────────
 class TranscribeResponse(BaseModel):
@@ -90,11 +159,84 @@ async def transcribe(model_key: str, audio: UploadFile = File(...)):
         latency_ms=round(latency_ms, 1),
     )
 
+
+@app.get("/system")
+def system_info():
+    """Get GPU VRAM + disk info."""
+    import torch
+    import shutil
+    info = {
+        "cuda": torch.cuda.is_available(),
+        "gpu": None,
+        "vram_total_gb": 0,
+        "vram_used_gb": 0,
+        "vram_free_gb": 0,
+        "disk_free_gb": 0
+    }
+    if torch.cuda.is_available():
+        props = torch.cuda.get_device_properties(0)
+        used = torch.cuda.memory_allocated(0)
+        total = props.total_memory
+        info.update({
+            "gpu": props.name,
+            "vram_total_gb": round(total / 1e9, 1),
+            "vram_used_gb": round(used / 1e9, 2),
+            "vram_free_gb": round((total - used) / 1e9, 2),
+        })
+    hf_home = os.environ.get("HF_HOME", os.path.expanduser("~/.cache/huggingface"))
+    try:
+        _, _, free_d = shutil.disk_usage(hf_home)
+        info["disk_free_gb"] = round(free_d / 1e9, 1)
+    except Exception:
+        info["disk_free_gb"] = 0
+    return info
+
+
+@app.get("/model-states")
+def all_model_states():
+    """Get status of all models at once."""
+    states = get_all_states()
+    return {
+        key: {
+            "status": states.get(key, get_state(key)).status,
+            "progress": states.get(key, get_state(key)).download_progress,
+            "size_gb": states.get(key, get_state(key)).download_size_gb,
+            "error": states.get(key, get_state(key)).error_msg,
+            "loaded": key in _cache,
+        }
+        for key in MODELS
+    }
+
+
+@app.post("/download/{model_key}")
+def download_model(model_key: str, background_tasks: BackgroundTasks):
+    """Download model to disk (not load to VRAM)."""
+    if model_key not in MODELS:
+        raise HTTPException(404, "Unknown model")
+    set_state(model_key, status=ModelStatus.DOWNLOADING, download_progress=0)
+    background_tasks.add_task(_download_task, model_key)
+    return {"started": model_key}
+
+
+@app.post("/load/{model_key}")
+def load_model_route(model_key: str, background_tasks: BackgroundTasks):
+    """Load model from disk into VRAM."""
+    if model_key not in MODELS:
+        raise HTTPException(404, "Unknown model")
+    background_tasks.add_task(_load_task, model_key)
+    return {"loading": model_key}
+
+
 @app.delete("/unload/{model_key}")
 def unload_model(model_key: str):
+    """Unload model from VRAM (keep on disk)."""
     if model_key in _cache:
         _cache[model_key].unload()
         del _cache[model_key]
+    # Set state back to DOWNLOADED if it was LOADED
+    current_state = get_state(model_key)
+    if current_state.status == ModelStatus.LOADED:
+        set_state(model_key, status=ModelStatus.DOWNLOADED)
     return {"unloaded": model_key}
 
 

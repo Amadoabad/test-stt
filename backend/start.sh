@@ -8,6 +8,12 @@ export PYTHONUNBUFFERED=1
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
+# Ensure ffmpeg is available
+if ! command -v ffmpeg &> /dev/null; then
+    echo "Installing ffmpeg..."
+    apt-get update -qq && apt-get install -y -qq ffmpeg
+fi
+
 # Install deps (uv reads pyproject.toml)
 echo "Installing dependencies..."
 uv sync
