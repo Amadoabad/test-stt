@@ -16,6 +16,7 @@ from audio_utils import decode_to_16k_mono
 from loaders.hf_loader import HFPipelineLoader, HFSeq2SeqLoader, SeamlessLoader, MMSLoader, CohereASRLoader
 from loaders.nemo_loader import NeMoLoader
 from loaders.qwen_loader import QwenLoader
+from loaders.omni_loader import OmniLoader
 from model_manager import ModelStatus, get_state, set_state, get_all_states
 
 app = FastAPI(title="STT Evaluation API")
@@ -36,7 +37,8 @@ LOADER_MAP = {
     "mms":         MMSLoader,
     "nemo":        NeMoLoader,
     "cohere":      CohereASRLoader,
-    "qwen":        QwenLoader
+    "qwen":        QwenLoader,
+    "omni":        OmniLoader,
 }
 
 # Warm cache: key → loader instance (loaded on first use)

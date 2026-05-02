@@ -7,7 +7,7 @@ class ModelConfig:
     id: str  # HuggingFace model ID or NGC path
     name: str  # display name shown in UI
     loader: Literal[
-        "hf_pipeline", "hf_seq2seq", "hf_ctc", "nemo", "seamless", "mms", "cohere", "qwen"
+        "hf_pipeline", "hf_seq2seq", "hf_ctc", "nemo", "seamless", "mms", "cohere", "qwen", "omni"
     ]
     lang: str = "ar"
     notes: str = ""
@@ -30,31 +30,31 @@ MODELS: dict[str, ModelConfig] = {
     "omni-300m": ModelConfig(
         id="facebook/omniASR-LLM-300M",
         name="OmniASR 300M",
-        loader="hf_pipeline",
+        loader="omni",
         trust_remote_code=True,
     ),
     "omni-1b": ModelConfig(
         id="facebook/omniASR-LLM-1B",
         name="OmniASR 1B",
-        loader="hf_pipeline",
+        loader="omni",
         trust_remote_code=True,
     ),
     "omni-3b": ModelConfig(
         id="facebook/omniASR-LLM-3B",
         name="OmniASR 3B",
-        loader="hf_pipeline",
+        loader="omni",
         trust_remote_code=True,
     ),
     "omni-7b": ModelConfig(
         id="facebook/omniASR-LLM-7B",
         name="OmniASR 7B",
-        loader="hf_pipeline",
+        loader="omni",
         trust_remote_code=True,
     ),
     "omni-7b-zs": ModelConfig(
         id="facebook/omniASR-LLM-7B-ZS",
         name="OmniASR 7B ZS",
-        loader="hf_pipeline",
+        loader="omni",
         trust_remote_code=True,
     ),
     "nvidia-pcd": ModelConfig(
