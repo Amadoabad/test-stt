@@ -18,7 +18,7 @@ class OmniLoader(BaseLoader):
         )
 
         with open("supported_langs.txt", "w") as f:
-            f.write(supported_langs)
+            f.writelines(supported_langs)
 
         self._loaded = True
 
