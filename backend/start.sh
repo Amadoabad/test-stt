@@ -20,4 +20,8 @@ uv sync
 
 # Launch
 echo "Starting STT Evaluation API on 0.0.0.0:8000"
-uv run uvicorn main:app --host 0.0.0.0 --port 8000 --workers 1
+uv run uvicorn main:app \
+  --host 0.0.0.0 \
+  --port 8000 \
+  --workers 1 \
+  --timeout-keep-alive 300

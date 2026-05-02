@@ -1,8 +1,10 @@
 import os
 import time
+import asyncio
 import traceback
 import threading
 from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
 import numpy as np
 from fastapi import FastAPI, UploadFile, File, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
@@ -35,6 +37,9 @@ LOADER_MAP = {
 
 # Warm cache: key → loader instance (loaded on first use)
 _cache: dict[str, object] = {}
+
+# Thread pool for blocking inference (one at a time)
+_executor = ThreadPoolExecutor(max_workers=1)
 
 def get_loader(model_key: str):
     if model_key not in MODELS:
@@ -146,9 +151,16 @@ async def transcribe(model_key: str, audio: UploadFile = File(...)):
 
     try:
         loader = get_loader(model_key)
+        loop = asyncio.get_event_loop()
         t0 = time.perf_counter()
-        text = loader.transcribe(wav, lang=MODELS[model_key].lang)
+        # Run blocking inference in thread pool so it doesn't block the event loop
+        text = await asyncio.wait_for(
+            loop.run_in_executor(_executor, loader.transcribe, wav, MODELS[model_key].lang),
+            timeout=180.0,  # 3 minutes max
+        )
         latency_ms = (time.perf_counter() - t0) * 1000
+    except asyncio.TimeoutError:
+        raise HTTPException(504, "Inference timed out after 3 minutes")
     except Exception:
         raise HTTPException(500, traceback.format_exc())
 

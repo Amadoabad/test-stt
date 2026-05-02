@@ -726,12 +726,18 @@ async function transcribe(blob, modelKey) {
   const fd = new FormData();
   fd.append('audio', blob, 'recording.webm');
 
-  setStatus('<span class="spinner"></span> Transcribing…');
+  setStatus('<span class="spinner"></span> Transcribing… (large models may take 30–60s)');
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 120_000); // 2 min timeout
+
   try {
     const res = await fetch(`${url}/transcribe/${modelKey}`, {
       method: 'POST',
       body: fd,
+      signal: controller.signal,
     });
+    clearTimeout(timeout);
     if (!res.ok) {
       const err = await res.text();
       throw new Error(err);
@@ -740,8 +746,13 @@ async function transcribe(blob, modelKey) {
     showResult(data);
     addHistory(data);
     setStatus(`Done · ${data.latency_ms}ms`);
-  } catch (e) {
-    setStatus(`Error: ${e.message}`, 'error');
+  } catch(e) {
+    clearTimeout(timeout);
+    if (e.name === 'AbortError') {
+      setStatus('Request timed out — model may still be processing. Try a shorter clip.', 'error');
+    } else {
+      setStatus(`Error: ${e.message}`, 'error');
+    }
     document.getElementById('result-box').textContent = '—';
   }
 }
