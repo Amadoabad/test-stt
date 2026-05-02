@@ -23,7 +23,8 @@ MODELS: dict[str, ModelConfig] = {
     "cohere-transcribe": ModelConfig(
         id="CohereLabs/cohere-transcribe-03-2026",
         name="Cohere Transcribe",
-        loader="hf_pipeline",
+        loader="hf_seq2seq",
+        notes="Custom seq2seq arch, requires trust_remote_code",
     ),
     "omni-300m": ModelConfig(
         id="facebook/omniASR-LLM-300M",
