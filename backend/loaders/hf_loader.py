@@ -131,6 +131,16 @@ class CohereASRLoader(BaseLoader):
             audio, sampling_rate=16000, return_tensors="pt", language=lang
         )
         inputs = inputs.to(self.model.device, dtype=self.model.dtype)
+        # Seed the decoder with the start token
+        decoder_input_ids = torch.tensor(
+            [[self.model.config.decoder_start_token_id]],
+            device=self.model.device,
+        )
+
         with torch.no_grad():
-            outputs = self.model.generate(**inputs, max_new_tokens=256)
-        return self.processor.decode(outputs, skip_special_tokens=True)
+            outputs = self.model.generate(
+                **inputs, 
+                decoder_input_ids=decoder_input_ids,
+                max_new_tokens=256)
+            
+        return self.processor.decode(outputs[0], skip_special_tokens=True)
