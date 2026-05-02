@@ -18,8 +18,8 @@ class OmniLoader(BaseLoader):
         )
 
         with open("supported_langs.txt", "w") as f:
-            f.writelines(supported_langs)
-
+            for lang in supported_langs:
+                f.write(f"{lang}\n")
         self._loaded = True
 
     def transcribe(self, audio: np.ndarray, lang: str = "ar") -> str:
