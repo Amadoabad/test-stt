@@ -3,6 +3,7 @@ import time
 import asyncio
 import traceback
 import threading
+import shutil
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
 import numpy as np
@@ -255,15 +256,35 @@ def load_model_route(model_key: str, background_tasks: BackgroundTasks):
 
 @app.delete("/unload/{model_key}")
 def unload_model(model_key: str):
-    """Unload model from VRAM (keep on disk)."""
     if model_key in _cache:
         _cache[model_key].unload()
         del _cache[model_key]
-    # Set state back to DOWNLOADED if it was LOADED
-    current_state = get_state(model_key)
-    if current_state.status == ModelStatus.LOADED:
-        set_state(model_key, status=ModelStatus.DOWNLOADED)
+    
+    from model_manager import set_state, ModelStatus
+    set_state(model_key, status=ModelStatus.DOWNLOADED)  # still on disk
+    
     return {"unloaded": model_key}
+
+@app.delete("/delete/{model_key}")
+def delete_model(model_key: str):
+    if model_key not in MODELS:
+        raise HTTPException(404, "Unknown model")
+    
+    # Unload from VRAM first if loaded
+    if model_key in _cache:
+        _cache[model_key].unload()
+        del _cache[model_key]
+    
+    # Delete from disk
+    hf_home = os.environ.get("HF_HOME", os.path.expanduser("~/.cache/huggingface"))
+    local_dir = os.path.join(hf_home, "hub", model_key)
+    if os.path.exists(local_dir):
+        shutil.rmtree(local_dir)
+    
+    from model_manager import set_state, ModelStatus
+    set_state(model_key, status=ModelStatus.NOT_DOWNLOADED, download_progress=0)
+    
+    return {"deleted": model_key}
 
 
 if __name__ == "__main__":

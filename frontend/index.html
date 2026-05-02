@@ -530,15 +530,17 @@ function renderModelCard(key, state) {
   let progress = '';
   let error = '';
 
-  // Status badge
   if (state.status === 'loaded') {
     statusBadge = `<div class="status-badge loaded"><span class="status-dot"></span>Loaded</div>`;
-    actions = `<button id="unload-${key}" class="btn btn-danger">Unload from VRAM</button>`;
+    actions = `
+      <button class="btn btn-danger" onclick="unloadModel('${key}')">Unload from VRAM</button>
+      <button class="btn btn-secondary" style="flex:0" onclick="deleteModel('${key}')">Delete</button>
+    `;
   } else if (state.status === 'downloaded') {
     statusBadge = `<div class="status-badge downloaded"><span class="status-dot"></span>Ready (on disk)</div>`;
     actions = `
-      <button id="load-${key}" class="btn btn-primary">Load into VRAM</button>
-      <button id="delete-${key}" class="btn btn-secondary" style="flex:0">Delete</button>
+      <button class="btn btn-primary" onclick="loadModel('${key}')">Load into VRAM</button>
+      <button class="btn btn-secondary" style="flex:0" onclick="deleteModel('${key}')">Delete</button>
     `;
   } else if (state.status === 'downloading') {
     statusBadge = `<div class="status-badge downloading"><span class="status-dot"></span>Downloading</div>`;
@@ -557,10 +559,10 @@ function renderModelCard(key, state) {
   } else if (state.status === 'error') {
     statusBadge = `<div class="status-badge error"><span class="status-dot"></span>Error</div>`;
     error = `<div class="card-error show">${state.error || 'Unknown error'}</div>`;
-    actions = `<button id="download-${key}" class="btn btn-primary">Retry Download</button>`;
+    actions = `<button class="btn btn-primary" onclick="downloadModel('${key}')">Retry Download</button>`;
   } else {
     statusBadge = `<div class="status-badge"><span class="status-dot"></span>Not downloaded</div>`;
-    actions = `<button id="download-${key}" class="btn btn-primary">Download</button>`;
+    actions = `<button class="btn btn-primary" onclick="downloadModel('${key}')">Download</button>`;
   }
 
   return `
@@ -612,12 +614,21 @@ async function unloadModel(key) {
   try {
     const res = await fetch(`${url}/unload/${key}`, { method: 'DELETE' });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    if (data) {
-      await refreshModelStates();
-    }
-  } catch (e) {
+    await refreshModelStates();
+  } catch(e) {
     console.error(`Unload error: ${key}`, e);
+  }
+}
+
+async function deleteModel(key) {
+  const url = document.getElementById('backend-url').value.trim();
+  if (!confirm(`Delete ${key} from disk? This will require re-downloading.`)) return;
+  try {
+    const res = await fetch(`${url}/delete/${key}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    await refreshModelStates();
+  } catch(e) {
+    console.error(`Delete error: ${key}`, e);
   }
 }
 
