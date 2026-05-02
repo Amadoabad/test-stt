@@ -131,10 +131,15 @@ class CohereASRLoader(BaseLoader):
             audio, sampling_rate=16000, return_tensors="pt", language=lang
         )
         inputs = inputs.to(self.model.device, dtype=self.model.dtype)
+        
         # Seed the decoder with the start token
+        tok = self.processor.tokenizer
+        start_id = tok.bos_token_id or tok.pad_token_id or 0
+        print(f"[Cohere] bos={tok.bos_token_id} pad={tok.pad_token_id} eos={tok.eos_token_id} vocab={tok.vocab_size}")
         decoder_input_ids = torch.tensor(
-            [[self.model.config.decoder_start_token_id]],
+            [[start_id]],
             device=self.model.device,
+            dtype=torch.long
         )
 
         with torch.no_grad():
