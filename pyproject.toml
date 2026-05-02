@@ -5,18 +5,18 @@ description = "STT Evaluation Platform for Arabic models"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-  "fastapi>=0.115",
-  "uvicorn[standard]>=0.30",
-  "python-multipart>=0.0.9",
-  "torch>=2.4.0",
-  "torchaudio>=2.4.0",
-  "transformers>=4.47",
-  "accelerate>=1.0",
-  "huggingface_hub>=0.25",
-  "soundfile>=0.12",
-  "numpy>=1.26",
-  "scipy>=1.14",
-  "datasets>=3.0",
-  "sentencepiece>=0.2",
-  "nemo_toolkit[asr]>=2.1"
+  "fastapi",
+  "uvicorn[standard]",
+  "python-multipart",
+  "torch",
+  "torchaudio",
+  "transformers",
+  "accelerate",
+  "huggingface_hub",
+  "soundfile",
+  "numpy",
+  "scipy",
+  "datasets",
+  "sentencepiece",
+  "nemo_toolkit[asr]"
 ]

@@ -555,25 +555,46 @@ function renderModelCard(key, state) {
 }
 
 async function downloadModel(key) {
-  const res = await fetchAPI(`/download/${key}`);
-  if (res) {
-    await refreshModelStates();
-    startPolling(true);
+  const url = document.getElementById('backend-url').value.trim();
+  try {
+    const res = await fetch(`${url}/download/${key}`, { method: 'POST' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    if (data) {
+      await refreshModelStates();
+      startPolling(true);
+    }
+  } catch (e) {
+    console.error(`Download error: ${key}`, e);
   }
 }
 
 async function loadModel(key) {
-  const res = await fetchAPI(`/load/${key}`);
-  if (res) {
-    await refreshModelStates();
-    startPolling(true);
+  const url = document.getElementById('backend-url').value.trim();
+  try {
+    const res = await fetch(`${url}/load/${key}`, { method: 'POST' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    if (data) {
+      await refreshModelStates();
+      startPolling(true);
+    }
+  } catch (e) {
+    console.error(`Load error: ${key}`, e);
   }
 }
 
 async function unloadModel(key) {
-  const res = await fetchAPI(`/unload/${key}`);
-  if (res) {
-    await refreshModelStates();
+  const url = document.getElementById('backend-url').value.trim();
+  try {
+    const res = await fetch(`${url}/unload/${key}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    if (data) {
+      await refreshModelStates();
+    }
+  } catch (e) {
+    console.error(`Unload error: ${key}`, e);
   }
 }
 
