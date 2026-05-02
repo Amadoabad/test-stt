@@ -110,3 +110,28 @@ class MMSLoader(BaseLoader):
             logits = self.model(**inputs).logits
         ids = torch.argmax(logits, dim=-1)
         return self.processor.batch_decode(ids)[0]
+    
+class CohereASRLoader(BaseLoader):
+    def load(self):
+        from transformers import CohereAsrForConditionalGeneration
+        self.processor = AutoProcessor.from_pretrained(
+            self.model_id,
+            token=HF_TOKEN,
+            trust_remote_code=self.trust_remote_code,
+        )
+        self.model = CohereAsrForConditionalGeneration.from_pretrained(
+            self.model_id,
+            device_map="auto",
+            token=HF_TOKEN,
+            trust_remote_code=self.trust_remote_code,
+        )
+        self._loaded = True
+
+    def transcribe(self, audio: np.ndarray, lang: str = "ar") -> str:
+        inputs = self.processor(
+            audio, sampling_rate=16000, return_tensors="pt", language=lang
+        )
+        inputs = inputs.to(self.model.device, dtype=self.model.dtype)
+        with torch.no_grad():
+            outputs = self.model.generate(**inputs, max_new_tokens=256)
+        return self.processor.decode(outputs, skip_special_tokens=True)

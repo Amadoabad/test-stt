@@ -7,7 +7,7 @@ class ModelConfig:
     id: str  # HuggingFace model ID or NGC path
     name: str  # display name shown in UI
     loader: Literal[
-        "hf_pipeline", "hf_seq2seq", "hf_ctc", "nemo", "seamless", "mms"
+        "hf_pipeline", "hf_seq2seq", "hf_ctc", "nemo", "seamless", "mms", 'cohere'
     ]
     lang: str = "ar"
     notes: str = ""
@@ -22,10 +22,10 @@ MODELS: dict[str, ModelConfig] = {
         notes="Uses AutoModelForSpeechSeq2Seq",
     ),
     "cohere-transcribe": ModelConfig(
-    id="CohereLabs/cohere-transcribe-03-2026",
-    name="Cohere Transcribe",
-    loader="hf_seq2seq",
-    trust_remote_code=True,
+        id="CohereLabs/cohere-transcribe-03-2026",
+        name="Cohere Transcribe",
+        loader="cohere",
+        trust_remote_code=True,
     ),
     "omni-300m": ModelConfig(
         id="facebook/omniASR-LLM-300M",

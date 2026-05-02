@@ -12,7 +12,7 @@ from pydantic import BaseModel
 
 from config import MODELS
 from audio_utils import decode_to_16k_mono
-from loaders.hf_loader import HFPipelineLoader, HFSeq2SeqLoader, SeamlessLoader, MMSLoader
+from loaders.hf_loader import HFPipelineLoader, HFSeq2SeqLoader, SeamlessLoader, MMSLoader, CohereASRLoader
 from loaders.nemo_loader import NeMoLoader
 from model_manager import ModelStatus, get_state, set_state, get_all_states
 
@@ -33,6 +33,7 @@ LOADER_MAP = {
     "seamless":    SeamlessLoader,
     "mms":         MMSLoader,
     "nemo":        NeMoLoader,
+    "cohere":      CohereASRLoader,
 }
 
 # Warm cache: key → loader instance (loaded on first use)
