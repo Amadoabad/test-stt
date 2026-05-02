@@ -113,13 +113,12 @@ class MMSLoader(BaseLoader):
     
 class CohereASRLoader(BaseLoader):
     def load(self):
-        from transformers import CohereAsrForConditionalGeneration
         self.processor = AutoProcessor.from_pretrained(
             self.model_id,
             token=HF_TOKEN,
             trust_remote_code=self.trust_remote_code,
         )
-        self.model = CohereAsrForConditionalGeneration.from_pretrained(
+        self.model = AutoModelForSpeechSeq2Seq.from_pretrained(
             self.model_id,
             device_map="auto",
             token=HF_TOKEN,
