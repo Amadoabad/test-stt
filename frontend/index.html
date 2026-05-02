@@ -415,10 +415,17 @@
 </div>
 
 <!-- Config -->
-<div class="config-section">
-  <label style="color:#888">Backend URL:</label>
-  <input id="backend-url" class="config-input" type="text" value="http://localhost:8000" placeholder="http://<host>:<port>">
-  <div class="config-status" id="connection-status">Not connected</div>
+<div class="card">
+  <div class="config-row">
+    <label>Backend URL</label>
+    <input id="backend-url" type="text" value="http://localhost:8000" placeholder="http://<vast-ip>:<port>">
+  </div>
+  <div class="config-row" style="margin-top:8px">
+    <label>HF Token</label>
+    <input id="hf-token" type="password" placeholder="hf_xxxxxxxxxxxx (for gated models)">
+    <button onclick="saveToken()" style="background:#222;border:1px solid #333;color:#ccc;border-radius:6px;padding:6px 12px;cursor:pointer;font-size:13px;white-space:nowrap">Set Token</button>
+  </div>
+  <div id="connection-status" style="font-size:12px;color:#555;margin-top:6px;text-align:left"></div>
 </div>
 
 <script>
@@ -440,6 +447,22 @@ async function fetchAPI(path) {
   } catch (e) {
     console.error(`API error: ${path}`, e);
     return null;
+  }
+}
+
+async function saveToken() {
+  const token = document.getElementById('hf-token').value.trim();
+  const url = document.getElementById('backend-url').value.trim();
+  try {
+    await fetch(`${url}/set-token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token }),
+    });
+    document.getElementById('connection-status').textContent =
+      token ? 'HF token set ✓' : 'HF token cleared';
+  } catch(e) {
+    document.getElementById('connection-status').textContent = 'Failed to set token';
   }
 }
 

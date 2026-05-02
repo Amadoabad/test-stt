@@ -98,7 +98,8 @@ def _download_task(model_key: str):
         snapshot_download(
             repo_id=cfg.id,
             local_dir=local_dir,
-            ignore_patterns=["*.msgpack", "*.h5", "flax_model*"]
+            ignore_patterns=["*.msgpack", "*.h5", "flax_model*"],
+            token=os.environ.get("HF_TOKEN") or None,  # None = unauthenticated
         )
         done.set()
         set_state(model_key, status=ModelStatus.DOWNLOADED, download_progress=100)
@@ -124,6 +125,10 @@ class TranscribeResponse(BaseModel):
     text: str
     latency_ms: float
 
+class TokenRequest(BaseModel):
+    token: str
+
+
 @app.get("/health")
 def health():
     import torch
@@ -133,6 +138,14 @@ def health():
         "gpu": torch.cuda.get_device_name(0) if torch.cuda.is_available() else None,
         "loaded_models": list(_cache.keys()),
     }
+
+@app.post("/set-token")
+def set_token(req: TokenRequest):
+    import loaders.hf_loader as hf
+    token = req.token.strip() or None
+    os.environ["HF_TOKEN"] = token or ""
+    hf.HF_TOKEN = token          # update the module-level var live
+    return {"set": bool(token)}
 
 @app.get("/models")
 def list_models():
