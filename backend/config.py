@@ -7,7 +7,7 @@ class ModelConfig:
     id: str  # HuggingFace model ID or NGC path
     name: str  # display name shown in UI
     loader: Literal[
-        "hf_pipeline", "hf_seq2seq", "hf_ctc", "nemo", "seamless", "mms", "cohere", "qwen", "omni"
+        "hf_pipeline", "hf_seq2seq", "hf_ctc", "nemo", "seamless", "mms", "cohere", "qwen", "omni", "whisper"
     ]
     lang: str = "ar"
     notes: str = ""
@@ -78,5 +78,11 @@ MODELS: dict[str, ModelConfig] = {
         name="MMS 1B All",
         loader="mms",
         notes="Uses Wav2Vec2ForCTC with mms-300m processor",
+    ),
+    "whisper-arabic-ft": ModelConfig(
+        id="dev-ahmedhany/whisper-large-v3-turbo-arabic-ft",
+        name="Whisper Large v3 Turbo Arabic FT",
+        loader="whisper",
+        notes="Fine-tuned Whisper model for Arabic speech recognition",
     ),
 }

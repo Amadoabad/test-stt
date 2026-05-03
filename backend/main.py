@@ -13,7 +13,7 @@ from pydantic import BaseModel
 
 from config import MODELS
 from audio_utils import decode_to_16k_mono
-from loaders.hf_loader import HFPipelineLoader, HFSeq2SeqLoader, SeamlessLoader, MMSLoader, CohereASRLoader
+from loaders.hf_loader import HFPipelineLoader, HFSeq2SeqLoader, SeamlessLoader, MMSLoader, CohereASRLoader, WhisperLoader
 from loaders.nemo_loader import NeMoLoader
 from loaders.qwen_loader import QwenLoader
 from loaders.omni_loader import OmniLoader
@@ -39,6 +39,7 @@ LOADER_MAP = {
     "cohere":      CohereASRLoader,
     "qwen":        QwenLoader,
     "omni":        OmniLoader,
+    "whisper":     WhisperLoader,
 }
 
 # Warm cache: key → loader instance (loaded on first use)

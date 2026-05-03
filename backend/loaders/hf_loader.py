@@ -7,6 +7,8 @@ from transformers import (
     AutoProcessor,
     SeamlessM4TForSpeechToText,
     Wav2Vec2ForCTC,
+    WhisperForConditionalGeneration,
+    WhisperProcessor,
 )
 from .base import BaseLoader
 
@@ -149,3 +151,37 @@ class CohereASRLoader(BaseLoader):
                 max_new_tokens=256)
             
         return self.processor.decode(outputs[0], skip_special_tokens=True)
+
+
+class WhisperLoader(BaseLoader):
+    """Whisper models for multilingual/fine-tuned ASR."""
+
+    def load(self):
+        self.processor = WhisperProcessor.from_pretrained(
+            self.model_id,
+            language="arabic",
+            task="transcribe",
+            token=HF_TOKEN,
+            trust_remote_code=self.trust_remote_code,
+        )
+        self.model = WhisperForConditionalGeneration.from_pretrained(
+            self.model_id,
+            torch_dtype=torch.bfloat16,
+            device_map="auto",
+            token=HF_TOKEN,
+            trust_remote_code=self.trust_remote_code,
+        )
+        self._loaded = True
+
+    def transcribe(self, audio: np.ndarray, lang: str = "ar") -> str:
+        inputs = self.processor(
+            audio, sampling_rate=16000, return_tensors="pt"
+        ).to(DEVICE)
+        
+        with torch.no_grad():
+            ids = self.model.generate(
+                input_features=inputs.input_features,
+                language="arabic",
+                task="transcribe",
+            )
+        return self.processor.batch_decode(ids, skip_special_tokens=True)[0]
