@@ -179,7 +179,7 @@ class WhisperLoader(BaseLoader):
     def transcribe(self, audio: np.ndarray, lang: str = "ar") -> str:
         inputs = self.processor(
             audio, sampling_rate=16000, return_tensors="pt"
-        ).to(DEVICE)
+        ).to(DEVICE, dtype=torch.bfloat16)
         
         with torch.no_grad():
             ids = self.model.generate(
