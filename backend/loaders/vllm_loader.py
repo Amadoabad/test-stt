@@ -6,8 +6,9 @@ import tempfile
 from .base import BaseLoader
 
 # vLLM server endpoint
-VLLM_BASE_URL = os.environ.get("VLLM_BASE_URL", "http://localhost:8000")
+VLLM_BASE_URL = os.environ.get("VLLM_BASE_URL", "http://localhost:8000").rstrip("/")
 VLLM_API_KEY = os.environ.get("VLLM_API_KEY", "")
+VLLM_AUDIO_ENDPOINT = os.environ.get("VLLM_AUDIO_ENDPOINT", "/v1/audio/transcriptions")
 
 
 class VLLMLoader(BaseLoader):
@@ -48,21 +49,42 @@ class VLLMLoader(BaseLoader):
                     files = {"file": audio_file}
                     data = {"model": self.model_id}
 
-                    response = requests.post(
-                        f"{VLLM_BASE_URL}/v1/audio/transcriptions",
-                        headers=headers,
-                        files=files,
-                        data=data,
-                        timeout=60,
-                    )
+                    # Try the configured endpoint first
+                    endpoints_to_try = [VLLM_AUDIO_ENDPOINT]
+                    # Add alternative path if not already included
+                    if VLLM_AUDIO_ENDPOINT != "/openai/v1/audio/transcriptions":
+                        endpoints_to_try.append("/openai/v1/audio/transcriptions")
 
-                if response.status_code != 200:
-                    raise RuntimeError(
-                        f"vLLM transcription failed: {response.status_code} {response.text}"
-                    )
+                    response = None
+                    last_error = None
 
-                result = response.json()
-                return result.get("text", "")
+                    for endpoint in endpoints_to_try:
+                        try:
+                            url = f"{VLLM_BASE_URL}{endpoint}"
+                            print(f"[vLLM] Trying endpoint: {url}")
+                            
+                            response = requests.post(
+                                url,
+                                headers=headers,
+                                files=files,
+                                data=data,
+                                timeout=60,
+                            )
+
+                            if response.status_code == 200:
+                                result = response.json()
+                                return result.get("text", "")
+                            else:
+                                last_error = f"{response.status_code} {response.text}"
+                                print(f"[vLLM] Endpoint returned {response.status_code}")
+                        except requests.exceptions.RequestException as e:
+                            last_error = str(e)
+                            print(f"[vLLM] Request failed: {e}")
+
+                    # If we get here, all endpoints failed
+                    error_msg = f"All vLLM endpoints failed. Last error: {last_error}"
+                    print(f"[vLLM] {error_msg}")
+                    raise RuntimeError(error_msg)
 
             finally:
                 # Clean up temporary file
