@@ -157,13 +157,7 @@ class WhisperLoader(BaseLoader):
     """Whisper models for multilingual/fine-tuned ASR."""
 
     def load(self):
-        self.processor = WhisperProcessor.from_pretrained(
-            self.model_id,
-            language="arabic",
-            task="transcribe",
-            token=HF_TOKEN,
-            trust_remote_code=self.trust_remote_code,
-        )
+
         self.model = WhisperForConditionalGeneration.from_pretrained(
             self.model_id,
             torch_dtype=torch.bfloat16,
@@ -171,6 +165,15 @@ class WhisperLoader(BaseLoader):
             token=HF_TOKEN,
             trust_remote_code=self.trust_remote_code,
         )
+
+        self.processor = WhisperProcessor.from_pretrained(
+            self.model_id,
+            language="arabic",
+            task="transcribe",
+            token=HF_TOKEN,
+            trust_remote_code=self.trust_remote_code,
+        )
+
         self._loaded = True
 
     def transcribe(self, audio: np.ndarray, lang: str = "ar") -> str:
