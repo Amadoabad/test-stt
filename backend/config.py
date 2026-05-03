@@ -7,7 +7,7 @@ class ModelConfig:
     id: str  # HuggingFace model ID or NGC path
     name: str  # display name shown in UI
     loader: Literal[
-        "hf_pipeline", "hf_seq2seq", "hf_ctc", "nemo", "seamless", "mms", "cohere", "qwen", "omni", "whisper"
+        "hf_pipeline", "hf_seq2seq", "hf_ctc", "nemo", "seamless", "mms", "cohere", "qwen", "omni", "whisper", "vllm"
     ]
     lang: str = "ar"
     notes: str = ""
@@ -24,8 +24,9 @@ MODELS: dict[str, ModelConfig] = {
     "cohere-transcribe": ModelConfig(
         id="CohereLabs/cohere-transcribe-03-2026",
         name="Cohere Transcribe",
-        loader="cohere",
+        loader="vllm",
         trust_remote_code=True,
+        notes="Served via vLLM. Start server with: vllm serve CohereLabs/cohere-transcribe-03-2026 --trust-remote-code",
     ),
     "omni-300m": ModelConfig(
         id="facebook/omniASR-LLM-300M",

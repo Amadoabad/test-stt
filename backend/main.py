@@ -17,6 +17,7 @@ from loaders.hf_loader import HFPipelineLoader, HFSeq2SeqLoader, SeamlessLoader,
 from loaders.nemo_loader import NeMoLoader
 from loaders.qwen_loader import QwenLoader
 from loaders.omni_loader import OmniLoader
+from loaders.vllm_loader import VLLMLoader
 from model_manager import ModelStatus, get_state, set_state, get_all_states
 
 app = FastAPI(title="STT Evaluation API")
@@ -40,6 +41,7 @@ LOADER_MAP = {
     "qwen":        QwenLoader,
     "omni":        OmniLoader,
     "whisper":     WhisperLoader,
+    "vllm":        VLLMLoader,
 }
 
 # Warm cache: key → loader instance (loaded on first use)
