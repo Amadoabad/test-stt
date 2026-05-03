@@ -34,7 +34,7 @@ MODELS: dict[str, ModelConfig] = {
         trust_remote_code=True,
     ),
     "omni-1b": ModelConfig(
-        id="facebook/omniASR-LLM-1B",
+        id="omniASR_LLM_1B",
         name="OmniASR 1B",
         loader="omni",
         trust_remote_code=True,
